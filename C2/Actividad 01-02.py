@@ -1,38 +1,44 @@
-#Funciones producto y consumidor clase bodegaa y 
+from threading import Thread
+import threading 
 
-import random
+import time, random
 import queue
-import threading
-import time
 
-ESPACIO = queue.Queue(10)
+bodega = queue.Queue(maxsize=20)
 
-class Bodega(threading.Thread):
+class Productor(Thread):
+    def __init__(self, array1):
+        threading.Thread.__init__(self)
+        self.array1 = array1
 
-    def productor():
+    def run(self):
         while True:
-            if ESPACIO.qsize() < 10:
-                valor = random.randint(1, 10)
-                ESPACIO.put(valor)
-                print(f'El productor inserto el producto: {valor}')
-                print(f'El espacio actual es: {list(ESPACIO.queue)}')
-                time.sleep(5)
-            else:
+            if not bodega.full():
+                array1 = random.randint(0, 20)
+                bodega.put(array1)
+                print(f"Se agrego un nuevo item: {array1}")
                 time.sleep(5)
 
+class Consumidor(Thread):
+    def __init__(self, array2):
+        threading.Thread.__init__(self)
+        self.array2 = array2
 
-    def consumidor():
+    def run(self):
         while True:
-            if ESPACIO.qsize() > 0:
-                valor = ESPACIO.get()
-                print(f'El consumidor agarro el producto: {valor}')
-                print(f'El espacio actual es: {list(ESPACIO.queue)}')
-                time.sleep(5)
-            else:
+            if not bodega.full():
+                array2= bodega.get()
+                print("El consumidor agarro: " + str(array2))
                 time.sleep(5)
 
-    productor = threading.Thread(target=productor)
-    consumidor = threading.Thread(target=consumidor)
+def main():
+    array=[]
+    hilo_productor = Productor(array)
+    hilo_consumidor = Consumidor(array)
 
-    productor.start()
-    consumidor.start()
+    hilo_productor.start()
+    hilo_consumidor.start() 
+
+
+if __name__ == "__main__":
+    main()
